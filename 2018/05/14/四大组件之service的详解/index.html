@@ -6,20 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://darkersnow.com">
-  <title>进程和线程的区别 | Darker Snow&#39;s Blog</title>
+  <title>四大组件之service的详解 | Darker Snow&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="什么是进程 进程是操作系统结构的基础，是程序在一个数据集合上运行的过程，是系统进行资源分配和调度的基本单位  上面是是对进程的一个定义，比较抽象！首先我们需要知道进程的3个组成部分  程序      (也就是程序代码） 数据集合    进程控制块PCB  进程每次执行时间总和 =  CPU加载上下文+CPU执行+CPU保存上下文 待续。。。。什么是线程进程的颗粒度太大，每次执行都需要上下文的调入，">
-<meta name="keywords" content="thread">
+  <meta name="description" content="简介Service是一个可以在后台执行长时间运行操作而不提供用户界面的应用组件.类似于没有UI组件的不可见的Activity。 二种启动方式构建IntentstartService()">
+<meta name="keywords" content="android">
 <meta property="og:type" content="article">
-<meta property="og:title" content="进程和线程的区别">
-<meta property="og:url" content="http://darkersnow.com/2018/04/17/进程和线程的区别/index.html">
+<meta property="og:title" content="四大组件之service的详解">
+<meta property="og:url" content="http://darkersnow.com/2018/05/14/四大组件之service的详解/index.html">
 <meta property="og:site_name" content="Darker Snow&#39;s Blog">
-<meta property="og:description" content="什么是进程 进程是操作系统结构的基础，是程序在一个数据集合上运行的过程，是系统进行资源分配和调度的基本单位  上面是是对进程的一个定义，比较抽象！首先我们需要知道进程的3个组成部分  程序      (也就是程序代码） 数据集合    进程控制块PCB  进程每次执行时间总和 =  CPU加载上下文+CPU执行+CPU保存上下文 待续。。。。什么是线程进程的颗粒度太大，每次执行都需要上下文的调入，">
+<meta property="og:description" content="简介Service是一个可以在后台执行长时间运行操作而不提供用户界面的应用组件.类似于没有UI组件的不可见的Activity。 二种启动方式构建IntentstartService()">
 <meta property="og:locale" content="zh_CH">
-<meta property="og:updated_time" content="2018-04-18T08:39:12.000Z">
+<meta property="og:updated_time" content="2018-06-07T10:42:18.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="进程和线程的区别">
-<meta name="twitter:description" content="什么是进程 进程是操作系统结构的基础，是程序在一个数据集合上运行的过程，是系统进行资源分配和调度的基本单位  上面是是对进程的一个定义，比较抽象！首先我们需要知道进程的3个组成部分  程序      (也就是程序代码） 数据集合    进程控制块PCB  进程每次执行时间总和 =  CPU加载上下文+CPU执行+CPU保存上下文 待续。。。。什么是线程进程的颗粒度太大，每次执行都需要上下文的调入，">
+<meta name="twitter:title" content="四大组件之service的详解">
+<meta name="twitter:description" content="简介Service是一个可以在后台执行长时间运行操作而不提供用户界面的应用组件.类似于没有UI组件的不可见的Activity。 二种启动方式构建IntentstartService()">
   
     <link rel="alternative" href="/atom.xml" title="Darker Snow&#39;s Blog" type="application/atom+xml">
   
@@ -149,56 +149,28 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-进程和线程的区别" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-四大组件之service的详解" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      进程和线程的区别
+      四大组件之service的详解
     </h1>
   
 
         
-        <a href="/2018/04/17/进程和线程的区别/" class="archive-article-date">
-  	<time datetime="2018-04-17T07:11:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-04-17</time>
+        <a href="/2018/05/14/四大组件之service的详解/" class="archive-article-date">
+  	<time datetime="2018-05-14T07:18:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-05-14</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="什么是进程"><a href="#什么是进程" class="headerlink" title="什么是进程"></a>什么是进程</h2><blockquote>
-<p>进程是操作系统结构的基础，是程序在一个数据集合上运行的过程，是系统进行资源分配和调度的基本单位</p>
-</blockquote>
-<p>上面是是对进程的一个定义，比较抽象！首先我们需要知道进程的3个组成部分</p>
-<ol>
-<li>程序      (也就是程序代码）</li>
-<li>数据集合   </li>
-<li>进程控制块PCB</li>
-</ol>
-<p>进程每次执行时间总和 =  CPU加载上下文+CPU执行+CPU保存上下文<br></p>
-<h3 id="待续。。。。"><a href="#待续。。。。" class="headerlink" title="待续。。。。"></a>待续。。。。</h3><h2 id="什么是线程"><a href="#什么是线程" class="headerlink" title="什么是线程"></a>什么是线程</h2><p>进程的颗粒度太大，每次执行都需要上下文的调入，保存，调出。然而一个程序不可能只有一条任务。多个任务不可能去各个创建进程，这样开销太大。所以引入线程！一个进程可以有许多线程，这些线程共享进程的上下文，不需要上下文的切换,所以开销很小。</p>
-<h4 id="为何要使用多线程"><a href="#为何要使用多线程" class="headerlink" title="为何要使用多线程"></a>为何要使用多线程</h4><ul>
-<li><p>使用多线程可以减少程序的响应时间。如果某一个操作很耗时，或者陷入长时间的等待，此时程序不会响应鼠标和键盘的操作，使用多线程可以把这个耗时的操作分配到一个单独的线程中去执行，从而使程序具备了更好的交互性</p>
-</li>
-<li><p>与进程相比，线程的创建和切换开销更小，同时多线程在数据共享方面效率非常高</p>
-</li>
-<li><p>多CPU或者多核计算机本身就具备执行多线程的能力，如果使用单个线程将无法重复利用计算机资源，这会造成巨大的浪费。在多核计算机中使用多线程能够提高CPU利用率</p>
-</li>
-<li><p>使用多线程能简化程序的结构，使程序便于理解和维护。</p>
-</li>
-</ul>
-<h3 id="线程的6种状态"><a href="#线程的6种状态" class="headerlink" title="线程的6种状态"></a>线程的6种状态</h3><ul>
-<li>New -&gt;线程的新创建状态</li>
-<li>Runnable -&gt;可运行状态</li>
-<li>Blocked -&gt;阻塞状态，表示线程被锁阻塞，它暂时不活动</li>
-<li>Waiting -&gt; 等待状态，线程暂时不活动，并且不运行任何代码，这消耗最少的资源</li>
-<li>Timed waiting -&gt; 超时等待状态，等待一段时间自行返回</li>
-<li>Terminated -&gt; 线程终止状态，（正常退出或没有捕获异常意外退出）</li>
-</ul>
-
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Service是一个可以在后台执行长时间运行操作而不提供用户界面的应用组件.类似于没有UI组件的不可见的Activity。</p>
+<h2 id="二种启动方式"><a href="#二种启动方式" class="headerlink" title="二种启动方式"></a>二种启动方式</h2><h4 id="构建Intent"><a href="#构建Intent" class="headerlink" title="构建Intent"></a>构建Intent</h4><h4 id="startService"><a href="#startService" class="headerlink" title="startService()"></a>startService()</h4>
       
 
       
@@ -232,7 +204,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">thread</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">android</a>
         		</li>
       		
 		</ul>
@@ -288,7 +260,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://darkersnow.com/2018/04/17/进程和线程的区别/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://darkersnow.com/2018/05/14/四大组件之service的详解/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -302,18 +274,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2018/04/18/重入锁和条件对象/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          重入锁和条件对象
-        
-      </div>
-    </a>
   
-  
-    <a href="/2018/04/17/线程安全的单例/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">线程安全的单例</div>
+    <a href="/2018/04/18/AsyncTask的解析/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">AsyncTask的解析</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -344,8 +307,8 @@
   <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
 <script>
   var cloudTieConfig = {
-    url: "http://darkersnow.com/2018/04/17/进程和线程的区别/", 
-    sourceId: "进程和线程的区别",
+    url: "http://darkersnow.com/2018/05/14/四大组件之service的详解/", 
+    sourceId: "四大组件之service的详解",
     productKey: "true",
     target: "cloud-tie-wrapper"
   };

@@ -8,18 +8,18 @@
   <link rel="dns-prefetch" href="http://darkersnow.com">
   <title>AsyncTask的解析 | Darker Snow&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="I like you">
+  <meta name="description" content="AsyncTask是Android为了简化 耗时操作 -&amp;gt; 更新UI 的流程封装的异步任务类。AsyncTask是一个抽象的泛型类，它有三个泛型参数    Params    参数类型     Progress    后台操作进度类型 Result 返回的结果类型  如果不需要某个参数可以将其设置为Void.AsyncTask有4个核心方法如下：  onPreExecute()这个方法是在主">
 <meta name="keywords" content="thread">
 <meta property="og:type" content="article">
 <meta property="og:title" content="AsyncTask的解析">
 <meta property="og:url" content="http://darkersnow.com/2018/04/18/AsyncTask的解析/index.html">
 <meta property="og:site_name" content="Darker Snow&#39;s Blog">
-<meta property="og:description" content="I like you">
+<meta property="og:description" content="AsyncTask是Android为了简化 耗时操作 -&amp;gt; 更新UI 的流程封装的异步任务类。AsyncTask是一个抽象的泛型类，它有三个泛型参数    Params    参数类型     Progress    后台操作进度类型 Result 返回的结果类型  如果不需要某个参数可以将其设置为Void.AsyncTask有4个核心方法如下：  onPreExecute()这个方法是在主">
 <meta property="og:locale" content="zh_CH">
-<meta property="og:updated_time" content="2018-04-19T10:23:32.000Z">
+<meta property="og:updated_time" content="2018-04-23T07:17:19.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="AsyncTask的解析">
-<meta name="twitter:description" content="I like you">
+<meta name="twitter:description" content="AsyncTask是Android为了简化 耗时操作 -&amp;gt; 更新UI 的流程封装的异步任务类。AsyncTask是一个抽象的泛型类，它有三个泛型参数    Params    参数类型     Progress    后台操作进度类型 Result 返回的结果类型  如果不需要某个参数可以将其设置为Void.AsyncTask有4个核心方法如下：  onPreExecute()这个方法是在主">
   
     <link rel="alternative" href="/atom.xml" title="Darker Snow&#39;s Blog" type="application/atom+xml">
   
@@ -169,7 +169,35 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>AsyncTask是Android为了简化 耗时操作 -&gt; 更新UI 的流程封装的异步任务类。<br>AsyncTask是一个抽象的泛型类，它有三个泛型参数  </p>
+<ul>
+<li>Params    参数类型    </li>
+<li>Progress    后台操作进度类型</li>
+<li>Result 返回的结果类型</li>
+</ul>
+<p>如果不需要某个参数可以将其设置为Void.<br>AsyncTask有4个核心方法如下：</p>
+<ul>
+<li><p>onPreExecute()<br>这个方法是在主线程中执行的。可以做些任务执行前的装备工作。</p>
+</li>
+<li><p>Result doInBackground(Params…)<br>这个方法是在线程池中进行的，用来执行较为耗时的操作。</p>
+</li>
+<li><p>onProgressUpdate(Progress…)<br>这个方法是在主线程中执行的，是用来更新进度的。可以调用publishProgress（）更新进度。</p>
+</li>
+<li><p>onPostExecute(Result)<br>这个方法是在主线程中执行的，主要用来耗时操作后的UI更新的</p>
+</li>
+</ul>
+<p>在了解了AsyncTask的基本使用，接下来分析下AsyncTask的源码。AsyncTask在Android 3.0之前和之后有着较大的改动。</p>
+<h3 id="Android3-0版本之前的AsyncTask"><a href="#Android3-0版本之前的AsyncTask" class="headerlink" title="Android3.0版本之前的AsyncTask"></a>Android3.0版本之前的AsyncTask</h3><p>主要不同是在线程池的使用上，大致代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">private static final int CORE_POOL_SIZE = 5;</span><br><span class="line">   private static final int MAXIMUM_POOL_SIZE = 128;</span><br><span class="line">   private static final int KEEP_ALIVE_SECONDS = 1;</span><br><span class="line"></span><br><span class="line">   private static final ThreadFactory sThreadFactory = new ThreadFactory() &#123;</span><br><span class="line">       private final AtomicInteger mCount = new AtomicInteger(1);</span><br><span class="line"></span><br><span class="line">       public Thread newThread(Runnable r) &#123;</span><br><span class="line">           return new Thread(r, &quot;AsyncTask #&quot; + mCount.getAndIncrement());</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;;</span><br><span class="line">   private static final BlockingQueue&lt;Runnable&gt; sPoolWorkQueue =</span><br><span class="line">           new LinkedBlockingQueue&lt;Runnable&gt;(10);</span><br><span class="line"></span><br><span class="line">   public static final Executor sExecutor = new ThreadPoolExecutor(</span><br><span class="line">           CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_SECONDS, TimeUnit.SECONDS,</span><br><span class="line">           sPoolWorkQueue, sThreadFactory);</span><br></pre></td></tr></table></figure>
+<p>从上面的代码得知，用到了 ThreadPoolExecutor 线程池。规定了线程池的核心线程数为5个，最大线程数为128个,阻塞队列容量为10，非核心线程的空闲后的超时等待新任务的时间为1秒。这样就存在一个问题：由上面配置可以知道同时可以容纳最多的任务数为138个，如果再提交第139个任务，线程池就会执行饱和策略，默认抛出异常 RejectedExecutionException.</p>
+<h3 id="Android3-0版本及之后的AsyncTask"><a href="#Android3-0版本及之后的AsyncTask" class="headerlink" title="Android3.0版本及之后的AsyncTask"></a>Android3.0版本及之后的AsyncTask</h3><p>先看看线程池的改进<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">private static final String LOG_TAG = &quot;AsyncTask&quot;;</span><br><span class="line"></span><br><span class="line">    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();</span><br><span class="line">    private static final int CORE_POOL_SIZE = Math.max(2, Math.min(CPU_COUNT - 1, 4));</span><br><span class="line">    private static final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2 + 1;</span><br><span class="line">    private static final int KEEP_ALIVE_SECONDS = 30;</span><br><span class="line"></span><br><span class="line">    private static final ThreadFactory sThreadFactory = new ThreadFactory() &#123;</span><br><span class="line">        private final AtomicInteger mCount = new AtomicInteger(1);</span><br><span class="line"></span><br><span class="line">        public Thread newThread(Runnable r) &#123;</span><br><span class="line">            return new Thread(r, &quot;AsyncTask #&quot; + mCount.getAndIncrement());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    private static final BlockingQueue&lt;Runnable&gt; sPoolWorkQueue =</span><br><span class="line">            new LinkedBlockingQueue&lt;Runnable&gt;(128);</span><br><span class="line">    public static final Executor THREAD_POOL_EXECUTOR;</span><br><span class="line">    static &#123;</span><br><span class="line">        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(</span><br><span class="line">                CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_SECONDS, TimeUnit.SECONDS,</span><br><span class="line">                sPoolWorkQueue, sThreadFactory);</span><br><span class="line">        threadPoolExecutor.allowCoreThreadTimeOut(true);</span><br><span class="line">        THREAD_POOL_EXECUTOR = threadPoolExecutor;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>这版本对核心线程和最大线程数的计算都基于了CPU_COUNT,即CPU的核心数，这样就可以适应机型，使用最适合当前机型的线程池。但是这还是没有解决3.0的饱和策略问题。所以为了解决这个问题，看如下代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"> public static final Executor SERIAL_EXECUTOR = new SerialExecutor();</span><br><span class="line"> private static volatile Executor sDefaultExecutor = SERIAL_EXECUTOR;</span><br><span class="line">private static class SerialExecutor implements Executor &#123;</span><br><span class="line">       final ArrayDeque&lt;Runnable&gt; mTasks = new ArrayDeque&lt;Runnable&gt;();</span><br><span class="line">       Runnable mActive;</span><br><span class="line"></span><br><span class="line">       public synchronized void execute(final Runnable r) &#123;</span><br><span class="line">           mTasks.offer(new Runnable() &#123;</span><br><span class="line">               public void run() &#123;</span><br><span class="line">                   try &#123;</span><br><span class="line">                       r.run();</span><br><span class="line">                   &#125; finally &#123;</span><br><span class="line">                       scheduleNext();</span><br><span class="line">                   &#125;</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;);</span><br><span class="line">           if (mActive == null) &#123;</span><br><span class="line">               scheduleNext();</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       protected synchronized void scheduleNext() &#123;</span><br><span class="line">           if ((mActive = mTasks.poll()) != null) &#123;</span><br><span class="line">               THREAD_POOL_EXECUTOR.execute(mActive);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>   以上代码自定义了一个Executor，里面定义了一个无解的循环队列，每执行一次任务，就把任务放到队列中，当一个任务执行完毕就调用scheduleNext()方法执行下一个任务。所以这样实现了一个串行的任务队列，保证了同一时间内仅有一个任务被执行，这样就不会触发饱和策略了。<br>下面来看看异步任务的逻辑。<br>首先看构造方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public AsyncTask(@Nullable Looper callbackLooper) &#123;</span><br><span class="line">        mHandler = callbackLooper == null || callbackLooper == Looper.getMainLooper()</span><br><span class="line">            ? getMainHandler()</span><br><span class="line">            : new Handler(callbackLooper);</span><br><span class="line"></span><br><span class="line">        mWorker = new WorkerRunnable&lt;Params, Result&gt;() &#123;</span><br><span class="line">            public Result call() throws Exception &#123;</span><br><span class="line">              //略...</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        mFuture = new FutureTask&lt;Result&gt;(mWorker) &#123;</span><br><span class="line">            @Override</span><br><span class="line">            protected void done() &#123;</span><br><span class="line">                  //略...</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p> 从上面代码可以看到，实例化了一个mHandler、mWorker和mFuture,跟踪源码发现WorkerRunnable是继承自Callable,所以可以看出是Callable 和FutureTask的结合在配合Handler的使用完成整个异步任务流程的。接下来在看看执行的代码：<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public final AsyncTask&lt;Params, Progress, Result&gt; execute(Params... params) &#123;</span><br><span class="line">       return executeOnExecutor(sDefaultExecutor, params);</span><br><span class="line"> &#125;</span><br><span class="line"> public final AsyncTask&lt;Params, Progress, Result&gt; executeOnExecutor(Executor exec,</span><br><span class="line">           Params... params) &#123;</span><br><span class="line">     if (mStatus != Status.PENDING) &#123;</span><br><span class="line">           switch (mStatus) &#123;</span><br><span class="line">               case RUNNING:</span><br><span class="line">                   throw new IllegalStateException(&quot;Cannot execute task:&quot;</span><br><span class="line">                           + &quot; the task is already running.&quot;);</span><br><span class="line">               case FINISHED:</span><br><span class="line">                   throw new IllegalStateException(&quot;Cannot execute task:&quot;</span><br><span class="line">                           + &quot; the task has already been executed &quot;</span><br><span class="line">                           + &quot;(a task can be executed only once)&quot;);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       mStatus = Status.RUNNING;</span><br><span class="line"></span><br><span class="line">       onPreExecute();</span><br><span class="line"></span><br><span class="line">       mWorker.mParams = params;</span><br><span class="line">       exec.execute(mFuture);</span><br><span class="line"></span><br><span class="line">       return this;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p> 发现最终调用的是executeOnExecutor方法，这里会先判断当前异步任务的状态，避免重复执行。然后在调用onPreExecute()方法。再把参数传给mWorker，最后调用传入的线程池执行mFuture.<br> 从上面得知，线程池传入任务后是串行执行的，线程执行任务是在mWorker的call（）方法调用doInBackground（）方法，把结果返回。<br> 再通过mFuture的done()方法执行postResultIfNotInvoked（get()），最终执行postResult()方法，然后通过Handler把结果发送给主线程，在InternalHandler里处理消息MESSAGE_POST_RESULT，最终调用finish（）方法，在这个方法里调用onPostExecute(),最终执行完毕。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>从上面得知，新版本的异步任务是串行的处理任务。如果想并行，可以直接调用<br>executeOnExecutor()方法，并且传入AsyncTask.THREAD_POOL_EXECUTOR或者自己定义的线程池就可以了。</p>
+
       
 
       
@@ -273,18 +301,18 @@
   
 <nav id="article-nav">
   
-    <a href="/2018/04/18/重入锁和条件对象/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2018/05/14/四大组件之service的详解/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          重入锁和条件对象
+          四大组件之service的详解
         
       </div>
     </a>
   
   
-    <a href="/2018/04/17/进程和线程的区别/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">进程和线程的区别</div>
+    <a href="/2018/04/18/重入锁和条件对象/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">重入锁和条件对象</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -418,6 +446,22 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">thread</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">性能优化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">java基础</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">android</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">dagger2</a>
               </li>
             
             <div class="clearfix"></div>
