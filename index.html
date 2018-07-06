@@ -500,170 +500,6 @@
 
 
   
-    <article id="post-线程安全的单例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/04/17/线程安全的单例/">线程安全的单例</a>
-    </h1>
-  
-
-        
-        <a href="/2018/04/17/线程安全的单例/" class="archive-article-date">
-  	<time datetime="2018-04-16T20:48:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-04-17</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>单例模式在实际项目中很容易用到，</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">thread</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/04/17/线程安全的单例/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-创建线程" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/04/17/创建线程/">关键字volatile的作用</a>
-    </h1>
-  
-
-        
-        <a href="/2018/04/17/创建线程/" class="archive-article-date">
-  	<time datetime="2018-04-16T20:48:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-04-17</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="Java内存模型"><a href="#Java内存模型" class="headerlink" title="Java内存模型"></a>Java内存模型</h2><p>java中的堆内存用来存储对象实例，堆内存是被所有线程共享的运行时内存区域。而局部变量和方法定义的参数则不会在线程之间共享，他们不会存在内存可见性的问题。线程之间的共享变量存储在主存中， 每个线程都会存储这个共享变量的副本，然后对副本进行数据操作，然后等线程结束，再把副本的值写入到主存中。</p>
-<h2 id="原子性、可见性、有序性"><a href="#原子性、可见性、有序性" class="headerlink" title="原子性、可见性、有序性"></a>原子性、可见性、有序性</h2><p>java并发编程的三个特性</p>
-<ul>
-<li>原子性 ——— 对数据的操作是不可中断的，要么不执行，要么执行完毕</li>
-<li>可见性 ——— 是指线程之间可见，线程A对共享变量的修改状态，线程B要立刻看见。所以可以使用volatile修饰，它会保证线程对它的修改会立即更新到主存中去。</li>
-<li>有序性 ——— java内存模型中允许编译器和处理器对指令进行重新排序，重新排序不会影响单线程，但是会影响多线程的并发执行的正确性。所以可以使用volatile，或者使用线程锁加锁代码块保证顺序执行</li>
-</ul>
-<h2 id="volatile-关键字"><a href="#volatile-关键字" class="headerlink" title="volatile 关键字"></a>volatile 关键字</h2><p>volatile的俩个关键作用是可见性和禁止指令重排序（有序性），<br>volatile 不保证原子性。<br><br>正确使用 volatile 关键字需要具备以下条件：</p>
-<ol>
-<li>对变量的写操作不会依赖于当前值</li>
-<li>该变量没有包含在其他具有其他变量的不变式中。</li>
-</ol>
-<p>第一个就是不能进行自增和自减的操作，第二个可以举个例子：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&gt;public class NumberRange&#123;</span><br><span class="line"></span><br><span class="line">   private volatile int lower,upper;</span><br><span class="line"></span><br><span class="line">   public void setLower(int value)&#123;</span><br><span class="line">       if(value &gt; upper) throw new Exception(&quot;不能设置比upper大的值&quot;);</span><br><span class="line">       lower = value;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   public void setUpper(int value)&#123;</span><br><span class="line">       if(value &lt; lower) throw new Exception(&quot;不能设置比lower小的值&quot;);</span><br><span class="line">       upper = value;</span><br><span class="line">   &#125;</span><br><span class="line">&gt;&#125;</span><br></pre></td></tr></table></figure>
-<p>上面这段代码如果由俩个线程同时执行，分别setLower(4)，setUpper(3),这样最后得到值是[4,3],明显是不对的</p>
-<h3 id="volatile-的应用场景"><a href="#volatile-的应用场景" class="headerlink" title="volatile 的应用场景"></a>volatile 的应用场景</h3><p>状态标志<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public volatile boolean stop = false;</span><br><span class="line"></span><br><span class="line">new Thread(new Runnable()&#123;</span><br><span class="line"> @Override</span><br><span class="line">  public void run()&#123;</span><br><span class="line">    while(!stop)&#123;</span><br><span class="line">      //do samething</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  &#125;).start();</span><br></pre></td></tr></table></figure></p>
-<p>双重检查模式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public class Singleton&#123;</span><br><span class="line">  private volatile static Singleton instance = null;</span><br><span class="line">  public Singleton getInstance()&#123;</span><br><span class="line">    if(instance==null)&#123;</span><br><span class="line">      synchronized(this)&#123;</span><br><span class="line">        if(instance == null)&#123;</span><br><span class="line">          instance = new Singleton();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return instance;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">thread</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/04/17/创建线程/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
     <article id="post-Android性能优化之减少APK大小" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -828,6 +664,80 @@
 
 
   
+    <article id="post-Dagger2 注解文档一" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/17/Dagger2 注解文档一/">Dagger2注解文档一</a>
+    </h1>
+  
+
+        
+        <a href="/2018/04/17/Dagger2 注解文档一/" class="archive-article-date">
+  	<time datetime="2018-04-16T20:48:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-04-17</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Dagger2"><a href="#Dagger2" class="headerlink" title="Dagger2"></a>Dagger2</h2><p>Dagger2是依赖注入的框架。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">dagger2</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/04/17/Dagger2 注解文档一/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Java类的加载" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -873,12 +783,37 @@
 <p>  2.使用静态变量（除final常量，因为final常量会在编译是就把值写入文件）</p>
 <p>  3.使用静态方法</p>
 <p>  4.反射调用类</p>
-<h2 id="从反编译文件分析类的加载时机"><a href="#从反编译文件分析类的加载时机" class="headerlink" title="从反编译文件分析类的加载时机"></a>从反编译文件分析类的加载时机</h2><p>看下面一段Java代码，知道最终输出的是什么吗？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public class SingleTon &#123;</span><br><span class="line">    public static SingleTon instance = new SingleTon();</span><br><span class="line">    public static int count1;</span><br><span class="line">    public static int count2 = 0;</span><br><span class="line">    public int count3 = 2;</span><br><span class="line">    public final static int count4 = 123;</span><br><span class="line">    public final int count5 = 456;</span><br><span class="line"></span><br><span class="line">    SingleTon() &#123;</span><br><span class="line">        count1++;</span><br><span class="line">        count2++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static class Main &#123;</span><br><span class="line">        public static void main(String[] args) &#123;</span><br><span class="line">            int a = SingleTon.count4;</span><br><span class="line">            int b = SingleTon.count1;</span><br><span class="line">            int c = SingleTon.count2;</span><br><span class="line">            System.out.println(&quot;b= &quot;+ b);</span><br><span class="line">            System.out.println(&quot;c= &quot;+ c);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>最终输出的是 b = 1 ，c = 0,我们可以通过javap -verbose SingleTon.class 反编译命令来查看编译后的内容，通过查看指令集来了解jvm对这个程序的运行过程。反编译后的内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br></pre></td><td class="code"><pre><span class="line">public class SingleTon</span><br><span class="line">  minor version: 0</span><br><span class="line">  major version: 52</span><br><span class="line">  flags: ACC_PUBLIC, ACC_SUPER</span><br><span class="line">Constant pool:</span><br><span class="line">   #1 = Methodref          #9.#31         // java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">   #2 = Fieldref           #6.#32         // SingleTon.count3:I</span><br><span class="line">   #3 = Fieldref           #6.#33         // SingleTon.count5:I</span><br><span class="line">   #4 = Fieldref           #6.#34         // SingleTon.count1:I</span><br><span class="line">   #5 = Fieldref           #6.#35         // SingleTon.count2:I</span><br><span class="line">   #6 = Class              #36            // SingleTon</span><br><span class="line">   #7 = Methodref          #6.#31         // SingleTon.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">   #8 = Fieldref           #6.#37         // SingleTon.instance:LSingleTon;</span><br><span class="line">   #9 = Class              #38            // java/lang/Object</span><br><span class="line">  #10 = Class              #39            // SingleTon$Main</span><br><span class="line">  #11 = Utf8               Main</span><br><span class="line">  #12 = Utf8               InnerClasses</span><br><span class="line">  #13 = Utf8               instance</span><br><span class="line">  #14 = Utf8               LSingleTon;</span><br><span class="line">  #15 = Utf8               count1</span><br><span class="line">  #16 = Utf8               I</span><br><span class="line">  #17 = Utf8               count2</span><br><span class="line">  #18 = Utf8               count3</span><br><span class="line">  #19 = Utf8               count4</span><br><span class="line">  #20 = Utf8               ConstantValue</span><br><span class="line">  #21 = Integer            123</span><br><span class="line">  #22 = Utf8               count5</span><br><span class="line">  #23 = Integer            456</span><br><span class="line">  #24 = Utf8               &lt;init&gt;</span><br><span class="line">  #25 = Utf8               ()V</span><br><span class="line">  #26 = Utf8               Code</span><br><span class="line">  #27 = Utf8               LineNumberTable</span><br><span class="line">  #28 = Utf8               &lt;clinit&gt;</span><br><span class="line">  #29 = Utf8               SourceFile</span><br><span class="line">  #30 = Utf8               SingleTon.java</span><br><span class="line">  #31 = NameAndType        #24:#25        // &quot;&lt;init&gt;&quot;:()V</span><br><span class="line">  #32 = NameAndType        #18:#16        // count3:I</span><br><span class="line">  #33 = NameAndType        #22:#16        // count5:I</span><br><span class="line">  #34 = NameAndType        #15:#16        // count1:I</span><br><span class="line">  #35 = NameAndType        #17:#16        // count2:I</span><br><span class="line">  #36 = Utf8               SingleTon</span><br><span class="line">  #37 = NameAndType        #13:#14        // instance:LSingleTon;</span><br><span class="line">  #38 = Utf8               java/lang/Object</span><br><span class="line">  #39 = Utf8               SingleTon$Main</span><br><span class="line">&#123;</span><br><span class="line">  public static SingleTon instance;</span><br><span class="line">    descriptor: LSingleTon;</span><br><span class="line">    flags: ACC_PUBLIC, ACC_STATIC</span><br><span class="line"></span><br><span class="line">  public static int count1;</span><br><span class="line">    descriptor: I</span><br><span class="line">    flags: ACC_PUBLIC, ACC_STATIC</span><br><span class="line"></span><br><span class="line">  public static int count2;</span><br><span class="line">    descriptor: I</span><br><span class="line">    flags: ACC_PUBLIC, ACC_STATIC</span><br><span class="line"></span><br><span class="line">  public int count3;</span><br><span class="line">    descriptor: I</span><br><span class="line">    flags: ACC_PUBLIC</span><br><span class="line"></span><br><span class="line">  public static final int count4;</span><br><span class="line">    descriptor: I</span><br><span class="line">    flags: ACC_PUBLIC, ACC_STATIC, ACC_FINAL</span><br><span class="line">    ConstantValue: int 123</span><br><span class="line"></span><br><span class="line">  public final int count5;</span><br><span class="line">    descriptor: I</span><br><span class="line">    flags: ACC_PUBLIC, ACC_FINAL</span><br><span class="line">    ConstantValue: int 456</span><br><span class="line"></span><br><span class="line">  SingleTon();</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags:</span><br><span class="line">    Code:</span><br><span class="line">      stack=2, locals=1, args_size=1</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: invokespecial #1                  // Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">         4: aload_0</span><br><span class="line">         5: iconst_2</span><br><span class="line">         6: putfield      #2                  // Field count3:I</span><br><span class="line">         9: aload_0</span><br><span class="line">        10: sipush        456</span><br><span class="line">        13: putfield      #3                  // Field count5:I</span><br><span class="line">        16: getstatic     #4                  // Field count1:I</span><br><span class="line">        19: iconst_1</span><br><span class="line">        20: iadd</span><br><span class="line">        21: putstatic     #4                  // Field count1:I</span><br><span class="line">        24: getstatic     #5                  // Field count2:I</span><br><span class="line">        27: iconst_1</span><br><span class="line">        28: iadd</span><br><span class="line">        29: putstatic     #5                  // Field count2:I</span><br><span class="line">        32: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 9: 0</span><br><span class="line">        line 5: 4</span><br><span class="line">        line 7: 9</span><br><span class="line">        line 10: 16</span><br><span class="line">        line 11: 24</span><br><span class="line">        line 12: 32</span><br><span class="line"></span><br><span class="line">  static &#123;&#125;;</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: ACC_STATIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=2, locals=0, args_size=0</span><br><span class="line">         0: new           #6                  // class SingleTon</span><br><span class="line">         3: dup</span><br><span class="line">         4: invokespecial #7                  // Method &quot;&lt;init&gt;&quot;:()V</span><br><span class="line">         7: putstatic     #8                  // Field instance:LSingleTon;</span><br><span class="line">        10: iconst_0</span><br><span class="line">        11: putstatic     #5                  // Field count2:I</span><br><span class="line">        14: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 2: 0</span><br><span class="line">        line 4: 10</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>我们从上面的类加载流程得知，准备阶段会为所有的静态变量赋默认值，所以count1和count2均为0。然后到了初始化阶段，会执行用户的赋值操作，如下反编译后的static的代码块：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">static &#123;&#125;;</span><br><span class="line">  descriptor: ()V</span><br><span class="line">  flags: ACC_STATIC</span><br><span class="line">  Code:</span><br><span class="line">    stack=2, locals=0, args_size=0</span><br><span class="line">       0: new           #6                  // class SingleTon</span><br><span class="line">       3: dup</span><br><span class="line">       4: invokespecial #7                  // Method &quot;&lt;init&gt;&quot;:()V</span><br><span class="line">       7: putstatic     #8                  // Field instance:LSingleTon;</span><br><span class="line">      10: iconst_0</span><br><span class="line">      11: putstatic     #5                  // Field count2:I</span><br><span class="line">      14: return</span><br><span class="line">    LineNumberTable:</span><br><span class="line">      line 2: 0</span><br><span class="line">      line 4: 10</span><br></pre></td></tr></table></figure></p>
-<p>我们会发现首先调用的是SingleTon的对象的初始化，new 是为SingleTon分配内存，dup 是复制栈顶数值并且进栈，然后调用invokespecial指令，调用<init>方法，也就是SingleTon的构造方法，在这个方法里会把count1和count2自增，这时count1和count2都等于1。<br>然后调用指令iconst_0让int型的常量值0进栈,这个0值是用户赋的值，然后调用putstatic 指令把栈顶的赋给count2静态变量，也就是把0值赋给count2。这时count1为1，count2为0.<br>所以最后的输出是1、0，不是1、1。可以看到jvm对static赋值顺序是我们定义静态变量并赋值的顺序。</init></p>
-<h3 id="编译器-对常量的优化"><a href="#编译器-对常量的优化" class="headerlink" title="编译器 对常量的优化"></a>编译器 对常量的优化</h3><p>我们看main入口函数的指令集<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public static void main(java.lang.String[]);</span><br><span class="line">  descriptor: ([Ljava/lang/String;)V</span><br><span class="line">  flags: ACC_PUBLIC, ACC_STATIC</span><br><span class="line">  Code:</span><br><span class="line">    stack=2, locals=4, args_size=1</span><br><span class="line">       0: bipush        123</span><br><span class="line">       2: istore_1</span><br><span class="line">       3: getstatic     #3                  // Field SingleTon.count1:I</span><br><span class="line">       6: istore_2</span><br><span class="line">       7: getstatic     #4                  // Field SingleTon.count2:I</span><br><span class="line">      10: istore_3</span><br><span class="line">      11: getstatic     #5                  // Field java/lang/System.out:Ljava/io/PrintStream;</span><br><span class="line">      14: iload_2</span><br><span class="line">      15: invokevirtual #6                  // Method java/io/PrintStream.println:(I)V</span><br><span class="line">      18: getstatic     #5                  // Field java/lang/System.out:Ljava/io/PrintStream;</span><br><span class="line">      21: iload_3</span><br><span class="line">      22: invokevirtual #6                  // Method java/io/PrintStream.println:(I)V</span><br><span class="line">      25: return</span><br><span class="line">    LineNumberTable:</span><br><span class="line">      line 16: 0</span><br><span class="line">      line 17: 3</span><br><span class="line">      line 18: 7</span><br><span class="line">      line 19: 11</span><br><span class="line">      line 20: 18</span><br><span class="line">      line 21: 25</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>在java代码中我们第一句是调用常量count4，我们会发现这里编译器对常量进行优化，bipush 123,这个指令的意思是将一个单字节常量值（这里是123）推送到栈顶，这里直接把常量值拿了过来，没有牵扯任何关于SingleTon的内容，所以这里调用静态常量时不会对SingleTon进行加载。</p>
+<h2 id="从反编译文件分析类的加载时机"><a href="#从反编译文件分析类的加载时机" class="headerlink" title="从反编译文件分析类的加载时机"></a>从反编译文件分析类的加载时机</h2><p>看下面一段Java代码，知道最终输出的是什么吗？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public class SingleTon &#123;</span><br><span class="line">    public static SingleTon instance = new SingleTon();</span><br><span class="line">    public static int count1;</span><br><span class="line">    public static int count2 = 0;</span><br><span class="line"></span><br><span class="line">    SingleTon() &#123;</span><br><span class="line">        count1++;</span><br><span class="line">        count2++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        int b = SingleTon.count1;</span><br><span class="line">        int c = SingleTon.count2;</span><br><span class="line">        System.out.println(&quot;b= &quot;+ b);</span><br><span class="line">        System.out.println(&quot;c= &quot;+ c);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>不仔细思考可能会以为是b=1,c=1,其实最终输出的是 b = 1 ，c = 0。<br>我们通过上面加载类的过程来分析。先看main函数，这里显示调用了SingleTon的静态变量count1,所以这里会去加载SingleTon这个Class，再看SingleTon有三个静态变量，这三个静态变量会在类加载的准备过程在JVM分配内存并且初始化默认值，这时三个静态变量的值是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">instance = null;</span><br><span class="line">count1 = 0;</span><br><span class="line">count2 = 0;</span><br></pre></td></tr></table></figure></p>
+<p>然后到了初始化阶段，SingleTon 会初始化自己的静态域,也就是我们自己赋的值。这时首先初始化instance = new SingleTon(),这时会创建一个SingleTon的实例，会走构造函数，实例化完成后count1和count2的值是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">count1 = 1；</span><br><span class="line">count2 = 1;</span><br></pre></td></tr></table></figure></p>
+<p>接下来由于我们count1没有主动赋值，所以在静态域不会对它进行初始化，<br>然后count2由于我们主动赋值了，所以会执行count2 = 0;的语句。<br>这时count1和count2的值是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">count1 = 1;</span><br><span class="line">count2 = 0;</span><br></pre></td></tr></table></figure></p>
+<p>如果我们把SingleTon的instance放到count2的下面定义初始化，那么答案就是1，1了。</p>
+<h3 id="编译器-对常量的优化"><a href="#编译器-对常量的优化" class="headerlink" title="编译器 对常量的优化"></a>编译器 对常量的优化</h3><p>类加载时机中为什么对fnal static的调用不会触发加载类呢，那是因为编译器对final修饰的常量会进行优化，应为final代表值不可变，所以编译器会把值直接写在编译后调用的地方。我们看下面一个例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class SingleTon &#123;</span><br><span class="line">    public final static int count = 123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(&quot;b= &quot;+ SingleTon.count);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们可以通过javap -verbose反编译class文件来查看编译后的内容：<br>我们主要看看main入口函数的编译后的内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public static void main(java.lang.String[]);</span><br><span class="line">    descriptor: ([Ljava/lang/String;)V</span><br><span class="line">    flags: ACC_PUBLIC, ACC_STATIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=2, locals=1, args_size=1</span><br><span class="line">         0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;</span><br><span class="line">         3: bipush        123</span><br><span class="line">         5: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V</span><br><span class="line">         8: return</span><br></pre></td></tr></table></figure></p>
+<p>我们会发现本来是以SingleTon,count调用的方式，在编译后的文件中的指令是 bipush 123,这个指令的意思是将一个单字节常量值（这里是123）推送到栈顶,我们发现直接把常量值123写在这里，根本没有去加载SingleTon这个class。所以调用静态常量不会触发class的加载。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>以一道面试题做总结，以Student student = new Student()为例说一下类的加载流程：</p>
+<ul>
+<li><p>1.物理加载:首先通过ClassLoader把Student的class文件的二进制流加载到jvm内存中（这个过程ClassLoader使用双亲委托机制会先在缓存中查找Student类，如果没找到，就从底部向上尝试加载类文件，如果全部ClassLoader都找不到文件，会抛出ClassNotFoundException异常）</p>
+</li>
+<li><p>2.验证：对加载的Student字节码进行验证，确认正确性和安全性。</p>
+</li>
+<li><p>3.准备：这个过程是C创建Student的数据结构，对Student中所有的静态变量初始化为默认值，这个默认值是JVM设定的（如0，null,false）,实例变量不会在这初始化，它们只会在对Student进行实例化的时候才会赋值。</p>
+</li>
+<li><p>4.解析：这里是JVM将常量池内的符号引用替换为直接引用的过程。</p>
+</li>
+<li><p>5.初始化:这里是处理用户对Student里的静态变量和final的静态自定义对象赋值的地方。<br>以上都只是类的加载过程，以下才开始类的实例化</p>
+</li>
+<li><p>6.使用new 关键字在堆空间里分配内存。</p>
+</li>
+<li><p>7.在堆内存中建立对象的特有属性（非静态的field），这里对他们进行初始化操作（JVM级的，赋值0，null,false）</p>
+</li>
+<li><p>8.进入构造函数，调用super(),父类也会在这一步进行实例化，步骤一样。</p>
+</li>
+<li><p>9.进行显示初始化，也就是我们对成员变量和常量的初始化赋值操作（应该是构造函数外的直接赋值 public int a = 1）。</p>
+</li>
+<li><p>10.执行构造函数中用户写的代码块。</p>
+</li>
+</ul>
 
       
 
@@ -932,19 +867,19 @@
 
 
   
-    <article id="post-Dagger2 注解文档一" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-创建线程" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/04/17/Dagger2 注解文档一/">Dagger2注解文档一</a>
+      <a class="article-title" href="/2018/04/17/创建线程/">关键字volatile的作用</a>
     </h1>
   
 
         
-        <a href="/2018/04/17/Dagger2 注解文档一/" class="archive-article-date">
+        <a href="/2018/04/17/创建线程/" class="archive-article-date">
   	<time datetime="2018-04-16T20:48:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-04-17</time>
 </a>
         
@@ -952,7 +887,23 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="Dagger2"><a href="#Dagger2" class="headerlink" title="Dagger2"></a>Dagger2</h2><p>Dagger2是依赖注入的框架。</p>
+        <h2 id="Java内存模型"><a href="#Java内存模型" class="headerlink" title="Java内存模型"></a>Java内存模型</h2><p>java中的堆内存用来存储对象实例，堆内存是被所有线程共享的运行时内存区域。而局部变量和方法定义的参数则不会在线程之间共享，他们不会存在内存可见性的问题。线程之间的共享变量存储在主存中， 每个线程都会存储这个共享变量的副本，然后对副本进行数据操作，然后等线程结束，再把副本的值写入到主存中。</p>
+<h2 id="原子性、可见性、有序性"><a href="#原子性、可见性、有序性" class="headerlink" title="原子性、可见性、有序性"></a>原子性、可见性、有序性</h2><p>java并发编程的三个特性</p>
+<ul>
+<li>原子性 ——— 对数据的操作是不可中断的，要么不执行，要么执行完毕</li>
+<li>可见性 ——— 是指线程之间可见，线程A对共享变量的修改状态，线程B要立刻看见。所以可以使用volatile修饰，它会保证线程对它的修改会立即更新到主存中去。</li>
+<li>有序性 ——— java内存模型中允许编译器和处理器对指令进行重新排序，重新排序不会影响单线程，但是会影响多线程的并发执行的正确性。所以可以使用volatile，或者使用线程锁加锁代码块保证顺序执行</li>
+</ul>
+<h2 id="volatile-关键字"><a href="#volatile-关键字" class="headerlink" title="volatile 关键字"></a>volatile 关键字</h2><p>volatile的俩个关键作用是可见性和禁止指令重排序（有序性），<br>volatile 不保证原子性。<br><br>正确使用 volatile 关键字需要具备以下条件：</p>
+<ol>
+<li>对变量的写操作不会依赖于当前值</li>
+<li>该变量没有包含在其他具有其他变量的不变式中。</li>
+</ol>
+<p>第一个就是不能进行自增和自减的操作，第二个可以举个例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&gt;public class NumberRange&#123;</span><br><span class="line"></span><br><span class="line">   private volatile int lower,upper;</span><br><span class="line"></span><br><span class="line">   public void setLower(int value)&#123;</span><br><span class="line">       if(value &gt; upper) throw new Exception(&quot;不能设置比upper大的值&quot;);</span><br><span class="line">       lower = value;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   public void setUpper(int value)&#123;</span><br><span class="line">       if(value &lt; lower) throw new Exception(&quot;不能设置比lower小的值&quot;);</span><br><span class="line">       upper = value;</span><br><span class="line">   &#125;</span><br><span class="line">&gt;&#125;</span><br></pre></td></tr></table></figure>
+<p>上面这段代码如果由俩个线程同时执行，分别setLower(4)，setUpper(3),这样最后得到值是[4,3],明显是不对的</p>
+<h3 id="volatile-的应用场景"><a href="#volatile-的应用场景" class="headerlink" title="volatile 的应用场景"></a>volatile 的应用场景</h3><p>状态标志<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public volatile boolean stop = false;</span><br><span class="line"></span><br><span class="line">new Thread(new Runnable()&#123;</span><br><span class="line"> @Override</span><br><span class="line">  public void run()&#123;</span><br><span class="line">    while(!stop)&#123;</span><br><span class="line">      //do samething</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  &#125;).start();</span><br></pre></td></tr></table></figure></p>
+<p>双重检查模式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public class Singleton&#123;</span><br><span class="line">  private volatile static Singleton instance = null;</span><br><span class="line">  public Singleton getInstance()&#123;</span><br><span class="line">    if(instance==null)&#123;</span><br><span class="line">      synchronized(this)&#123;</span><br><span class="line">        if(instance == null)&#123;</span><br><span class="line">          instance = new Singleton();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return instance;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 
       
 
@@ -966,7 +917,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">dagger2</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">thread</a>
         		</li>
       		
 		</ul>
@@ -976,7 +927,81 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2018/04/17/Dagger2 注解文档一/">展开全文 >></a>
+          <a class="article-more-a" href="/2018/04/17/创建线程/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-线程安全的单例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/17/线程安全的单例/">线程安全的单例</a>
+    </h1>
+  
+
+        
+        <a href="/2018/04/17/线程安全的单例/" class="archive-article-date">
+  	<time datetime="2018-04-16T20:48:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-04-17</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>单例模式在实际项目中很容易用到，</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">thread</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/04/17/线程安全的单例/">展开全文 >></a>
         </p>
       
 
@@ -1095,11 +1120,15 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">性能优化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">thread</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">性能优化</a>
+                <a href="javascript:void(0)" class="js-tag color3">dagger2</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1108,10 +1137,6 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">android</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">dagger2</a>
               </li>
             
             <div class="clearfix"></div>
